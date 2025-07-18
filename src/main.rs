@@ -7,8 +7,8 @@ use std::path::Path;
 use crate::constants::{FILES_LOG, MESSY_DIR};
 
 mod constants {
-    pub static MESSY_DIR: &'static str = "messy_folder";
-    pub static FILES_LOG: &'static str = "files.log";
+    pub static MESSY_DIR: &str = "messy_folder";
+    pub static FILES_LOG: &str = "files.log";
 }
 
 fn remove_with_exception<F: AsRef<Path>>(
@@ -73,10 +73,7 @@ fn parse_entries<F: AsRef<Path>>(
 
             remove_with_exception(entry, main_folder.as_ref())?;
         } else {
-            let mut files_log = OpenOptions::new()
-                .write(true)
-                .append(true)
-                .open(files_log.as_ref())?;
+            let mut files_log = OpenOptions::new().append(true).open(files_log.as_ref())?;
 
             let mut log_string = OsString::new();
 
