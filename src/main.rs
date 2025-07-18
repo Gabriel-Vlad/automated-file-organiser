@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use std::error::Error;
 use std::fs::{self, DirBuilder, ReadDir};
 use std::io::Write;
@@ -18,7 +16,7 @@ fn parse_entries<F: AsRef<Path>>(root: ReadDir, main_folder: F) -> Result<(), Bo
 
         if file_metadata.is_dir() {
             let new_root = fs::read_dir(entry.path())?;
-            parse_entries(new_root, main_folder.as_ref());
+            parse_entries(new_root, main_folder.as_ref())?;
 
             fs::remove_dir(entry.path())?;
         } else {
@@ -35,7 +33,7 @@ fn parse_entries<F: AsRef<Path>>(root: ReadDir, main_folder: F) -> Result<(), Bo
                         print!("- image");
 
                         let images_dir = main_folder.as_ref().join("images");
-                        dir_builder.create(&images_dir);
+                        dir_builder.create(&images_dir)?;
 
                         if let Some(file_name) = entry.path().file_name() {
                             new_path = new_path.join(images_dir).join(file_name);
@@ -48,7 +46,7 @@ fn parse_entries<F: AsRef<Path>>(root: ReadDir, main_folder: F) -> Result<(), Bo
                         print!("- document");
 
                         let documents_dir = main_folder.as_ref().join("documents");
-                        dir_builder.create(&documents_dir);
+                        dir_builder.create(&documents_dir)?;
 
                         if let Some(file_name) = entry.path().file_name() {
                             new_path = new_path.join(documents_dir).join(file_name);
@@ -61,7 +59,7 @@ fn parse_entries<F: AsRef<Path>>(root: ReadDir, main_folder: F) -> Result<(), Bo
                         print!("- archive");
 
                         let archive_dir = main_folder.as_ref().join("archives");
-                        dir_builder.create(&archive_dir);
+                        dir_builder.create(&archive_dir)?;
 
                         if let Some(file_name) = entry.path().file_name() {
                             new_path = new_path.join(archive_dir).join(file_name);
@@ -85,6 +83,6 @@ fn parse_entries<F: AsRef<Path>>(root: ReadDir, main_folder: F) -> Result<(), Bo
 fn main() -> Result<(), Box<dyn Error>> {
     let root: ReadDir = fs::read_dir(MESSY_DIR)?;
     let main_folder = Path::new(MESSY_DIR).to_owned();
-    parse_entries(root, main_folder);
+    parse_entries(root, main_folder)?;
     Ok(())
 }
