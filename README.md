@@ -42,7 +42,7 @@ The moved files' paths are logged in the logger file chose by the user within th
 After a directory is fully traversed, the program performs a cleanup and removes it.
 
 The software's folder contains an **example** directory that has a before and after
-tests showing how the software works practically
+tests showing how the software works practically.
 
 ## List of feature ideas
 
