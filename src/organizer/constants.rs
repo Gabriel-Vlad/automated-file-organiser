@@ -1,3 +1,5 @@
+// -- An array containing directory names
+// to be ignored from traversing and modifying --
 pub const SPECIAL_FOLDERS: &[&'static str] = &[
     "images",
     "documents",
@@ -11,6 +13,8 @@ pub const SPECIAL_FOLDERS: &[&'static str] = &[
     "others",
 ];
 
+// -- Extensions to organize into their own directories
+// given by the array's name --
 pub const IMAGE_EXTENSIONS: &[&'static str] = &["png", "jpg", "jpeg", "gif", "webp", "bmp", "ico"];
 pub const DOCUMENT_EXTENSIONS: &[&'static str] = &["md", "rtf", "log", "txt", "odt", "html", "pdf"];
 pub const DATA_INTERCHANGE_FORMAT_EXTENSIONS: &[&'static str] = &["json", "csv", "xml", "toml"];

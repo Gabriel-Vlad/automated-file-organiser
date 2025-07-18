@@ -3,6 +3,7 @@ use std::error::Error;
 use std::fs::{self, File, OpenOptions, ReadDir};
 use std::path::PathBuf;
 
+// -- Program's config structure --
 pub struct Config {
     pub directory_to_sort: PathBuf,
     pub root_iterator: ReadDir,
@@ -10,6 +11,7 @@ pub struct Config {
 }
 
 impl Config {
+    // -- Method to parse the given arguments --
     pub fn parse(args: Args) -> Result<Self, Box<dyn Error>> {
         let mut args = args.skip(1);
 

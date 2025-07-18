@@ -8,23 +8,31 @@ use std::path::Path;
 
 use constants::*;
 
+// -- The main function responsible for organizing the files
+// by their extensions into their own named directories --
 pub fn parse_entries<F: AsRef<Path>>(
     root: ReadDir,
     directory_to_organize: F,
     files_log: &mut File,
 ) -> Result<(), Box<dyn Error>> {
+    // -- Iterating over the entires and files --
     for entry in root {
         let entry = entry?;
         let file_metadata = entry.metadata()?;
 
         if file_metadata.is_dir() {
+            // -- Verifies if the directory can be
+            // traversed and modified --
             let is_dir_valid = is_directory_valid(&entry)?;
 
             if is_dir_valid {
                 let new_root = fs::read_dir(entry.path())?;
 
+                // -- Recursively exploring the current directory --
                 parse_entries(new_root, directory_to_organize.as_ref(), files_log)?;
 
+                // -- Removes the old directories after they have been
+                // emptied completely unless specified --
                 remove_with_exception(entry, directory_to_organize.as_ref())?;
             }
         } else {
@@ -32,6 +40,7 @@ pub fn parse_entries<F: AsRef<Path>>(
 
             log_string.push(entry.path().as_os_str());
 
+            // -- Organizing the files in each directory the belong to --
             if let Some(ext) = entry.path().extension() {
                 match ext.to_str().ok_or("Something went wrong")? {
                     ext if IMAGE_EXTENSIONS.contains(&ext) => {
