@@ -41,6 +41,9 @@ created directories, if they don't exist already, depending on their extensions.
 The moved files' paths are logged in the logger file chose by the user within the input.
 After a directory is fully traversed, the program performs a cleanup and removes it.
 
+The software's folder contains an **example** directory that has a before and after
+tests showing how the software works practically
+
 ## List of feature ideas
 
 - Being able to chose if the program should perform a cleanup or not
