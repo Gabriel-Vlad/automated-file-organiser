@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         &mut config.files_log,
     )?;
 
-    println!("Selected directory successfully organized!",);
+    println!("Selected directory successfully organized!");
 
     Ok(())
 }
