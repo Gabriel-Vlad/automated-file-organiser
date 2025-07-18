@@ -35,9 +35,10 @@ cargo run ./my_downloads cleanup_report.log
 ## Hoe does the software work
 
 The program takes the user input, than parses it into a Config structure. After that,
-the main function responsible for organizing the directory, is called. It
+the function responsible for organizing the directory is called. It
 recursively traverses each directory and moves the files within in newly
-created directories, if they don't exist already, depending on their extensions.
+created directories with suggestive names, if they don't exist already, depending on their extensions.
+For seeing the names that this software uses for its directories please go to **src/organizer/constants.rs**.
 The moved files' paths are logged in the logger file chose by the user within the input.
 After a directory is fully traversed, the program performs a cleanup and removes it.
 
