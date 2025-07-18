@@ -68,7 +68,7 @@ fn parse_entries<F: AsRef<Path>>(root: ReadDir, main_folder: F) -> Result<(), Bo
                         fs::rename(entry.path(), new_path)?;
                     }
 
-                    _ => print!("- random"),
+                    _ => (),
                 }
             }
 
