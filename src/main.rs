@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::ffi::{OsStr, OsString};
-use std::fs::{self, DirBuilder, DirEntry, OpenOptions, ReadDir};
+use std::fs::{self, DirBuilder, DirEntry, File, OpenOptions, ReadDir};
 use std::io::Write;
 use std::path::Path;
 
@@ -16,7 +16,9 @@ fn remove_with_exception<F: AsRef<Path>>(
     main_folder: F,
 ) -> Result<(), Box<dyn Error>> {
     let entry_path = entry.path();
-    let entry_path = entry_path.as_os_str();
+    let entry_path = entry_path
+        .file_name()
+        .ok_or("Could not retrieve file name")?;
 
     let main_folder = main_folder.as_ref().as_os_str();
     let archives = OsStr::new("archives");
@@ -53,10 +55,31 @@ fn is_directory_valid(entry: &DirEntry) -> Result<bool, Box<dyn Error>> {
     Ok(is_valid)
 }
 
+fn change_file_path<F: AsRef<Path>>(
+    entry: DirEntry,
+    main_folder: F,
+    new_folder_name: &str,
+) -> Result<(), Box<dyn Error>> {
+    let new_dir = main_folder.as_ref().join(new_folder_name);
+    DirBuilder::new().recursive(true).create(&new_dir)?;
+
+    let entry_path = entry.path();
+
+    let file_name = entry_path
+        .file_name()
+        .ok_or("Could not retrieve file name")?;
+
+    let new_path = new_dir.join(file_name);
+
+    fs::rename(entry.path(), new_path)?;
+
+    Ok(())
+}
+
 fn parse_entries<F: AsRef<Path>>(
     root: ReadDir,
     main_folder: F,
-    files_log: F,
+    files_log: &mut File,
 ) -> Result<(), Box<dyn Error>> {
     for entry in root {
         let entry = entry?;
@@ -68,13 +91,11 @@ fn parse_entries<F: AsRef<Path>>(
             if is_dir_valid {
                 let new_root = fs::read_dir(entry.path())?;
 
-                parse_entries(new_root, main_folder.as_ref(), files_log.as_ref())?;
+                parse_entries(new_root, main_folder.as_ref(), files_log)?;
 
                 remove_with_exception(entry, main_folder.as_ref())?;
             }
         } else {
-            let mut files_log = OpenOptions::new().append(true).open(files_log.as_ref())?;
-
             let mut log_string = OsString::new();
 
             log_string.push(entry.path().as_os_str());
@@ -111,40 +132,19 @@ fn parse_entries<F: AsRef<Path>>(
     Ok(())
 }
 
-fn change_file_path<F: AsRef<Path>>(
-    entry: DirEntry,
-    main_folder: F,
-    new_folder_name: &str,
-) -> Result<(), Box<dyn Error>> {
-    let new_dir = main_folder.as_ref().join(new_folder_name);
-    DirBuilder::new().recursive(true).create(&new_dir)?;
-
-    let entry_path = entry.path();
-
-    let file_name = entry_path
-        .file_name()
-        .ok_or("Could not retrieve file name")?;
-
-    let new_path = new_dir.join(file_name);
-
-    fs::rename(entry.path(), new_path)?;
-
-    Ok(())
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let root: ReadDir = fs::read_dir(MESSY_DIR)?;
     let main_folder = Path::new(MESSY_DIR);
     let files_log = Path::new(FILES_LOG);
 
-    {
-        OpenOptions::new()
-            .truncate(true)
-            .write(true)
-            .create(true)
-            .open(files_log)?;
-    }
+    let mut files_log = OpenOptions::new()
+        .truncate(true)
+        .write(true)
+        .create(true)
+        .open(files_log)?;
 
-    parse_entries(root, main_folder, files_log)?;
+    parse_entries(root, main_folder, &mut files_log)?;
+
+    println!("Files successfully organized!");
     Ok(())
 }
