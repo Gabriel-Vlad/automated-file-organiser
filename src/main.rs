@@ -15,44 +15,40 @@ fn remove_with_exception<F: AsRef<Path>>(
     entry: DirEntry,
     main_folder: F,
 ) -> Result<(), Box<dyn Error>> {
-    println!("{:?}", entry.path());
-
     let entry_path = entry.path();
     let entry_path = entry_path.as_os_str();
+
     let main_folder = main_folder.as_ref().as_os_str();
-    let archives = OsString::from("archives");
-    let documents = OsString::from("documents");
-    let images = OsString::from("images");
-    let others = OsString::from("others");
-
-    let is_valid = !(entry_path == main_folder
-        || entry_path == archives
-        || entry_path == documents
-        || entry_path == images
-        || entry_path == others);
-
-    if !is_valid {
-        fs::remove_dir(entry.path())?;
-    }
-
-    Ok(())
-}
-
-fn ignore_directories(entry: &DirEntry) -> Result<bool, Box<dyn Error>> {
-    let file_metadata = entry.metadata()?;
-
-    let entry_path = entry.path();
-    let entry_path = entry_path.as_os_str();
     let archives = OsStr::new("archives");
     let documents = OsStr::new("documents");
     let images = OsStr::new("images");
     let others = OsStr::new("others");
 
-    let is_valid = file_metadata.is_dir()
-        && !(entry_path == archives
-            || entry_path == documents
-            || entry_path == images
-            || entry_path == others);
+    let special_folders = [main_folder, archives, documents, images, others];
+
+    let is_valid = !special_folders.contains(&entry_path);
+
+    if is_valid {
+        fs::remove_dir_all(entry.path())?;
+    }
+
+    Ok(())
+}
+
+fn is_directory_valid(entry: &DirEntry) -> Result<bool, Box<dyn Error>> {
+    let entry_path = entry.path();
+    let entry_path = entry_path
+        .file_name()
+        .ok_or("Could not retrieve file name")?;
+
+    let archives = OsStr::new("archives");
+    let documents = OsStr::new("documents");
+    let images = OsStr::new("images");
+    let others = OsStr::new("others");
+
+    let special_folders = [archives, documents, images, others];
+
+    let is_valid = !special_folders.contains(&entry_path);
 
     Ok(is_valid)
 }
@@ -64,14 +60,18 @@ fn parse_entries<F: AsRef<Path>>(
 ) -> Result<(), Box<dyn Error>> {
     for entry in root {
         let entry = entry?;
-        let is_dir_valid = ignore_directories(&entry)?;
+        let file_metadata = entry.metadata()?;
 
-        if is_dir_valid {
-            let new_root = fs::read_dir(entry.path())?;
+        if file_metadata.is_dir() {
+            let is_dir_valid = is_directory_valid(&entry)?;
 
-            parse_entries(new_root, main_folder.as_ref(), files_log.as_ref())?;
+            if is_dir_valid {
+                let new_root = fs::read_dir(entry.path())?;
 
-            remove_with_exception(entry, main_folder.as_ref())?;
+                parse_entries(new_root, main_folder.as_ref(), files_log.as_ref())?;
+
+                remove_with_exception(entry, main_folder.as_ref())?;
+            }
         } else {
             let mut files_log = OpenOptions::new().append(true).open(files_log.as_ref())?;
 
@@ -143,8 +143,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             .write(true)
             .create(true)
             .open(files_log)?;
-
-        println!("Success");
     }
 
     parse_entries(root, main_folder, files_log)?;
