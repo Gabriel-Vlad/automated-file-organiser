@@ -133,7 +133,7 @@ fn parse_entries<F: AsRef<Path>>(
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let root: ReadDir = fs::read_dir(MESSY_DIR)?;
+    let root_iterator: ReadDir = fs::read_dir(MESSY_DIR)?;
     let main_folder = Path::new(MESSY_DIR);
     let files_log = Path::new(FILES_LOG);
 
@@ -143,7 +143,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .create(true)
         .open(files_log)?;
 
-    parse_entries(root, main_folder, &mut files_log)?;
+    parse_entries(root_iterator, main_folder, &mut files_log)?;
 
     println!("Files successfully organized!");
     Ok(())
