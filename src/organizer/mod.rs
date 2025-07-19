@@ -14,6 +14,7 @@ pub fn parse_entries<F: AsRef<Path>>(
     root: ReadDir,
     directory_to_organize: F,
     files_log: &mut File,
+    perform_cleanup: bool,
 ) -> Result<(), Box<dyn Error>> {
     // -- Iterating over the entires and files --
     for entry in root {
@@ -29,11 +30,18 @@ pub fn parse_entries<F: AsRef<Path>>(
                 let new_root = fs::read_dir(entry.path())?;
 
                 // -- Recursively exploring the current directory --
-                parse_entries(new_root, directory_to_organize.as_ref(), files_log)?;
+                parse_entries(
+                    new_root,
+                    directory_to_organize.as_ref(),
+                    files_log,
+                    perform_cleanup,
+                )?;
 
                 // -- Removes the old directories after they have been
                 // emptied completely unless specified --
-                remove_with_exception(entry, directory_to_organize.as_ref())?;
+                if perform_cleanup {
+                    remove_with_exception(entry, directory_to_organize.as_ref())?;
+                }
             }
         } else {
             let mut log_string = OsString::new();
