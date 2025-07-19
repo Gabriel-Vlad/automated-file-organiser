@@ -114,6 +114,27 @@ pub fn parse_entries<F: AsRef<Path>>(
                         &mut log_string,
                     )?,
 
+                    ext if EBOOK_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "ebooks",
+                        &mut log_string,
+                    )?,
+
+                    ext if EXECUTABLE_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "executables",
+                        &mut log_string,
+                    )?,
+
+                    ext if DATABASE_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "databases",
+                        &mut log_string,
+                    )?,
+
                     _ => change_file_path(
                         entry,
                         directory_to_organize.as_ref(),
