@@ -13,7 +13,7 @@ use constants::*;
 pub fn parse_entries<F: AsRef<Path>>(
     root: ReadDir,
     directory_to_organize: F,
-    files_log: &mut File,
+    logger_file: &mut File,
     perform_cleanup: bool,
 ) -> Result<(), Box<dyn Error>> {
     // -- Iterating over the entires and files --
@@ -33,7 +33,7 @@ pub fn parse_entries<F: AsRef<Path>>(
                 parse_entries(
                     new_root,
                     directory_to_organize.as_ref(),
-                    files_log,
+                    logger_file,
                     perform_cleanup,
                 )?;
 
@@ -65,7 +65,7 @@ pub fn parse_entries<F: AsRef<Path>>(
                         &mut log_string,
                     )?,
 
-                    ext if ARCHIVES_EXTENSIONS.contains(&ext) => change_file_path(
+                    ext if ARCHIVE_EXTENSIONS.contains(&ext) => change_file_path(
                         entry,
                         directory_to_organize.as_ref(),
                         "archives",
@@ -89,7 +89,7 @@ pub fn parse_entries<F: AsRef<Path>>(
                     ext if VIDEO_EXTENSIONS.contains(&ext) => change_file_path(
                         entry,
                         directory_to_organize.as_ref(),
-                        "video",
+                        "videos",
                         &mut log_string,
                     )?,
 
@@ -124,7 +124,7 @@ pub fn parse_entries<F: AsRef<Path>>(
             }
 
             log_string.push("\n");
-            files_log.write_all(log_string.as_encoded_bytes())?;
+            logger_file.write_all(log_string.as_encoded_bytes())?;
         }
     }
 
@@ -133,7 +133,7 @@ pub fn parse_entries<F: AsRef<Path>>(
 
 fn perform_cleanup_with_exceptions<F: AsRef<Path>>(
     entry: DirEntry,
-    main_folder: F,
+    directory_to_organize: F,
 ) -> Result<(), Box<dyn Error>> {
     let entry_path = entry.path();
     let entry_path = entry_path
@@ -144,7 +144,7 @@ fn perform_cleanup_with_exceptions<F: AsRef<Path>>(
         .iter()
         .map(OsStr::new)
         .collect::<Vec<&OsStr>>();
-    special_folders.push(main_folder.as_ref().as_os_str());
+    special_folders.push(directory_to_organize.as_ref().as_os_str());
 
     let is_valid = !special_folders.contains(&entry_path);
 
@@ -177,13 +177,13 @@ fn change_file_path<F: AsRef<Path>>(
     new_folder_name: &str,
     log_string: &mut OsString,
 ) -> Result<(), Box<dyn Error>> {
-    let mut log_string_to_push = new_folder_name
+    let mut log_string_slice = new_folder_name
         .to_uppercase()
         .split('_')
         .collect::<Vec<&str>>()
         .join("-");
-    log_string_to_push.insert_str(0, " - ");
-    log_string.push(log_string_to_push);
+    log_string_slice.insert_str(0, " - ");
+    log_string.push(log_string_slice);
 
     let new_dir = directory_to_organize.as_ref().join(new_folder_name);
     DirBuilder::new().recursive(true).create(&new_dir)?;

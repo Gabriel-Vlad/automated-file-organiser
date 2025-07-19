@@ -1,26 +1,26 @@
-use std::env::Args;
+use std::env;
 use std::error::Error;
 use std::fs::{self, File, OpenOptions, ReadDir};
 use std::path::PathBuf;
 
 // -- Program's config structure --
 pub struct Config {
-    pub directory_to_sort: PathBuf,
+    pub directory_to_organize: PathBuf,
     pub root_iterator: ReadDir,
-    pub files_log: File,
+    pub logger_file: File,
 }
 
 impl Config {
     // -- Method to parse the given arguments --
-    pub fn parse(args: Args) -> Result<Self, Box<dyn Error>> {
+    pub fn parse(args: env::Args) -> Result<Self, Box<dyn Error>> {
         let mut args = args.skip(1);
 
-        let directory_to_sort = PathBuf::from(
+        let directory_to_organize = PathBuf::from(
             args.next()
                 .ok_or("Directory to organize not provided: -- <DIRECTORY> --")?,
         );
 
-        let files_log_path = PathBuf::from(
+        let logger_file_path = PathBuf::from(
             args.next()
                 .ok_or("File to log not provided: -- <LOGGER-FILE> --")?,
         );
@@ -29,17 +29,17 @@ impl Config {
             return Err("Too many arguments provided".into());
         }
 
-        let root_iterator = fs::read_dir(&directory_to_sort)?;
-        let files_log = OpenOptions::new()
+        let root_iterator = fs::read_dir(&directory_to_organize)?;
+        let logger_file = OpenOptions::new()
             .truncate(true)
             .write(true)
             .create(true)
-            .open(files_log_path)?;
+            .open(logger_file_path)?;
 
         Ok(Self {
-            directory_to_sort,
+            directory_to_organize,
             root_iterator,
-            files_log,
+            logger_file,
         })
     }
 }

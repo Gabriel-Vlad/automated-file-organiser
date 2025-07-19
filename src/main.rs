@@ -15,8 +15,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     // -- Calling the main function to organize the directory --
     organizer::parse_entries(
         config.root_iterator,
-        config.directory_to_sort,
-        &mut config.files_log,
+        config.directory_to_organize,
+        &mut config.logger_file,
         perform_cleanup,
     )?;
 
