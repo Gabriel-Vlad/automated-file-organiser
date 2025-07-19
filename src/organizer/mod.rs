@@ -101,7 +101,7 @@ pub fn parse_entries<F: AsRef<Path>>(
                     }
 
                     _ => {
-                        log_string.push(" - OTHERS");
+                        log_string.push(" - OTHER");
                         change_file_path(entry, directory_to_organize.as_ref(), "others")?;
                     }
                 }
