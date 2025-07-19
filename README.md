@@ -32,7 +32,7 @@ Example:
 cargo run ./my_downloads cleanup_report.log
 ```
 
-## Hoe does the software work
+## How does the software work
 
 The program takes the user input, than parses it into a Config structure. After that,
 the function responsible for organizing the directory is called. It
