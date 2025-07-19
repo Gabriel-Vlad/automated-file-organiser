@@ -17,12 +17,12 @@ impl Config {
 
         let directory_to_sort = PathBuf::from(
             args.next()
-                .ok_or("Document to sort not provided: -- <directory-to-sort> --")?,
+                .ok_or("Directory to organize not provided: -- <DIRECTORY> --")?,
         );
 
         let files_log_path = PathBuf::from(
             args.next()
-                .ok_or("File to log not provided: -- <log-file> --")?,
+                .ok_or("File to log not provided: -- <LOGGER-FILE> --")?,
         );
 
         if args.next().is_some() {
