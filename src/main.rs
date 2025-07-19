@@ -8,10 +8,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     // -- Parsing input arguments --
     let mut config = config::Config::parse(env::args())?;
 
-    let perform_cleanup = match env::var("CLEANUP") {
-        Ok(value) => value.parse::<bool>()?,
-        Err(_) => false,
-    };
+    // -- This variables indicated to the program
+    // if it should perform a cleanup on the directories --
+    let perform_cleanup = should_perform_cleanup()?;
 
     // -- Calling the main function to organize the directory --
     organizer::parse_entries(
@@ -24,4 +23,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Selected directory successfully organized!");
 
     Ok(())
+}
+
+fn should_perform_cleanup() -> Result<bool, Box<dyn Error>> {
+    let result = env::var("CLEANUP").map_or(Ok(false), |var| var.parse::<bool>())?;
+
+    Ok(result)
 }

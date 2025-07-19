@@ -40,7 +40,7 @@ pub fn parse_entries<F: AsRef<Path>>(
                 // -- Removes the old directories after they have been
                 // emptied completely unless specified --
                 if perform_cleanup {
-                    remove_with_exception(entry, directory_to_organize.as_ref())?;
+                    perform_cleanup_with_exceptions(entry, directory_to_organize.as_ref())?;
                 }
             }
         } else {
@@ -115,7 +115,7 @@ pub fn parse_entries<F: AsRef<Path>>(
     Ok(())
 }
 
-fn remove_with_exception<F: AsRef<Path>>(
+fn perform_cleanup_with_exceptions<F: AsRef<Path>>(
     entry: DirEntry,
     main_folder: F,
 ) -> Result<(), Box<dyn Error>> {
