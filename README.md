@@ -1,8 +1,7 @@
-# **AUTOMATED-FILE-ORGANIZER**
+# **Automated File Organizer**
 
 This tool organizes a given directory by it's contained files' extensions.
-The files are moved into specific newly created directories depending on
-the name of the extension.
+The files are moved into specific newly created directories within the chosen directory, depending on the name of the extension.
 
 ## The features of the software are
 
@@ -36,11 +35,11 @@ cargo run ./my_downloads cleanup_report.log
 
 The program takes the user input, than parses it into a Config structure. After that,
 the function responsible for organizing the directory is called. It
-recursively traverses each directory and moves the files within in newly
+recursively traverses each child directory and moves the files within in newly
 created directories with suggestive names, if they don't exist already, depending on their extensions.
 For seeing the names that this software uses for its directories please go to **src/organizer/constants.rs**.
-The moved files' paths are logged in the logger file chosen by the user within the input.
-After a directory is fully traversed, if specified via an environment variable, the program performs a cleanup and removes it.
+The moved files' paths are logged in the logger file chosen by the user within the input. This file will be automatically created if it does not exist.
+After a directory is fully traversed it is considered empty, so, if specified via an environment variable, the program performs a cleanup and removes it.
 
 The software's folder contains an **example** directory that has a before and after
 test showing how the software works practically.
@@ -100,15 +99,15 @@ will print nothing.
 The environment variable name is **CLEANUP**. This can only be set to **true** or **false**.
 Any other values will result in an **error** terminating the process early. The variable is
 set to **false** by default.The value **true** indicates that the program should perform a
-cleanup, whereas the value **false** indicated that it should not perform a cleanup.
+cleanup, whereas the value **false** indicates that it should not perform a cleanup.
 
 ### Example
 
 ```bash
-// -- sets the env variable to true --
+// -- set the env variable to true --
 $env:CLEANUP="true"
 // -- check if the variable exists --
 Write-Host $env:CLEANUP
-// -- unset the env the variable --
+// -- unset the env variable --
 Remove-Item env:CLEANUP
 ```
