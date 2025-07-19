@@ -106,7 +106,6 @@ cleanup, whereas the value **false** indicated that it should not perform a clea
 
 ```bash
 $env:CLEANUP="true"
-
 Write-Host $env:CLEANUP
 Remove-Item env:CLEANUP
 ```
