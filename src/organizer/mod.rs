@@ -51,59 +51,75 @@ pub fn parse_entries<F: AsRef<Path>>(
             // -- Organizing the files in each directory the belong to --
             if let Some(ext) = entry.path().extension() {
                 match ext.to_str().ok_or("Something went wrong")? {
-                    ext if IMAGE_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - IMAGE");
-                        change_file_path(entry, directory_to_organize.as_ref(), "images")?;
-                    }
+                    ext if IMAGE_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "images",
+                        &mut log_string,
+                    )?,
 
-                    ext if DOCUMENT_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - DOCUMENT");
-                        change_file_path(entry, directory_to_organize.as_ref(), "documents")?;
-                    }
+                    ext if DOCUMENT_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "documents",
+                        &mut log_string,
+                    )?,
 
-                    ext if ARCHIVES_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - ARCHIVE");
-                        change_file_path(entry, directory_to_organize.as_ref(), "archives")?;
-                    }
+                    ext if ARCHIVES_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "archives",
+                        &mut log_string,
+                    )?,
 
-                    ext if DATA_INTERCHANGE_FORMAT_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - DATA-INTERCHANGE");
-                        change_file_path(
-                            entry,
-                            directory_to_organize.as_ref(),
-                            "data_interchange",
-                        )?;
-                    }
+                    ext if DATA_INTERCHANGE_FORMAT_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "data_interchange",
+                        &mut log_string,
+                    )?,
 
-                    ext if AUDIO_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - AUDIO");
-                        change_file_path(entry, directory_to_organize.as_ref(), "audio")?;
-                    }
+                    ext if AUDIO_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "audio",
+                        &mut log_string,
+                    )?,
 
-                    ext if VIDEO_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - VIDEO");
-                        change_file_path(entry, directory_to_organize.as_ref(), "video")?;
-                    }
+                    ext if VIDEO_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "video",
+                        &mut log_string,
+                    )?,
 
-                    ext if SOURCE_CODE_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - SOURCE-CODE");
-                        change_file_path(entry, directory_to_organize.as_ref(), "source_code")?;
-                    }
+                    ext if SOURCE_CODE_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "source_code",
+                        &mut log_string,
+                    )?,
 
-                    ext if PRESENTATION_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - PRESENTATION");
-                        change_file_path(entry, directory_to_organize.as_ref(), "presentations")?;
-                    }
+                    ext if PRESENTATION_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "presentations",
+                        &mut log_string,
+                    )?,
 
-                    ext if FONT_EXTENSIONS.contains(&ext) => {
-                        log_string.push(" - FONT");
-                        change_file_path(entry, directory_to_organize.as_ref(), "fonts")?;
-                    }
+                    ext if FONT_EXTENSIONS.contains(&ext) => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "fonts",
+                        &mut log_string,
+                    )?,
 
-                    _ => {
-                        log_string.push(" - OTHER");
-                        change_file_path(entry, directory_to_organize.as_ref(), "others")?;
-                    }
+                    _ => change_file_path(
+                        entry,
+                        directory_to_organize.as_ref(),
+                        "others",
+                        &mut log_string,
+                    )?,
                 }
             }
 
@@ -159,7 +175,16 @@ fn change_file_path<F: AsRef<Path>>(
     entry: DirEntry,
     directory_to_organize: F,
     new_folder_name: &str,
+    log_string: &mut OsString,
 ) -> Result<(), Box<dyn Error>> {
+    let mut log_string_to_push = new_folder_name
+        .to_uppercase()
+        .split('_')
+        .collect::<Vec<&str>>()
+        .join("-");
+    log_string_to_push.insert_str(0, " - ");
+    log_string.push(log_string_to_push);
+
     let new_dir = directory_to_organize.as_ref().join(new_folder_name);
     DirBuilder::new().recursive(true).create(&new_dir)?;
 
