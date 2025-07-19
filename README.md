@@ -99,12 +99,14 @@ will print nothing.
 
 The environment variable name is **CLEANUP**. This can only be set to **true** or **false**.
 Any other values will result in an **error** terminating the process early. The variable is
-set to **false** by default.
+set to **false** by default.The value **true** indicates that the program should perform a
+cleanup, whereas the value **false** indicated that it should not perform a cleanup.
 
 > Example
 
 ```bash
 $env:CLEANUP="true"
+
 Write-Host $env:CLEANUP
 Remove-Item env:CLEANUP
 ```
